@@ -1,0 +1,208 @@
+<script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                  headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+        </script><!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+    <title>SmartHome Dashboard</title>
+</head>
+<body>
+    <div class="background" id="background"></div>
+    <div class="connection-status" id="connectionStatus">
+        <i class="fas fa-wifi"></i> Connecting...
+    </div>
+    
+    <div class="content">
+        <!-- Navigation -->
+        <nav class="navbar">
+            <a href="#" class="nav-item active" data-page="home">
+                <i class="fas fa-home"></i> Home
+            </a>
+            <a href="#" class="nav-item" data-page="devices">
+                <i class="fas fa-cog"></i> Devices
+            </a>
+            <a href="#" class="nav-item" data-page="analytics">
+                <i class="fas fa-chart-line"></i> Analytics
+            </a>
+            <a href="#" class="nav-item" data-page="settings">
+                <i class="fas fa-sliders-h"></i> Settings
+            </a>
+        </nav>
+
+        <!-- Main Content -->
+        <div id="main">
+            <div class="grid wide">
+                <div class="container">
+                    <div class="row">
+                        <!-- Left Column - Sensor Data -->
+                        <div class="col l-9">
+                            <div class="row">
+                                <!-- Hero Card -->
+                                <div class="col l-1-2">
+                                    <div class="card hero-card">
+                                        <div>
+                                            <h2><i class="fas fa-home"></i> Smart Home Dashboard</h2>
+                                            <p>Welcome to your intelligent home control center</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Humidity Card -->
+                                <div class="col l-1-3">
+                                    <div class="card sensor-card">
+                                        <div class="status-indicator" id="humidityStatus"></div>
+                                        <div class="device-icon">
+                                            <i class="fas fa-tint"></i>
+                                        </div>
+                                        <h2>Humidity</h2>
+                                        <p id="humidity"><span class="loading"></span></p>
+                                    </div>
+                                </div>
+
+                                <!-- Light Sensor -->
+                                <div class="col l-4">
+                                    <div class="card sensor-card">
+                                        <div class="status-indicator" id="lightStatus"></div>
+                                        <div class="device-icon">
+                                            <i class="fas fa-sun"></i>
+                                        </div>
+                                        <h2>Light Level</h2>
+                                        <p id="light_value"><span class="loading"></span></p>
+                                    </div>
+                                </div>
+
+                                <!-- Temperature Display -->
+                                <div class="col l-4">
+                                    <div class="card info-card">
+                                        <div class="status-indicator" id="tempStatus"></div>
+                                        <h2>Temperature</h2>
+                                        <div class="fahrenheit-display" id="fahrenheit">--°F</div>
+                                    </div>
+                                </div>
+
+                                <!-- Night Mode -->
+                                <div class="col l-4">
+                                    <div class="card control-card">
+                                        <h2>Night Mode</h2>
+                                        <div class="device-icon">
+                                            <i id="toggle-icon" class="fas fa-sun"></i>
+                                        </div>
+                                        <label class="toggle-switch">
+                                            <input type="checkbox" id="nightshift">
+                                            <span class="slider"></span>
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <!-- Device Controls -->
+                                <div class="col l-4">
+                                    <div class="card control-card">
+                                        <h2><i class="fas fa-lightbulb"></i> Lamp</h2>
+                                        <label class="toggle-switch">
+                                            <input type="checkbox" id="lightSwitch">
+                                            <span class="slider"></span>
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <div class="col l-4">
+                                    <div class="card control-card">
+                                        <h2><i class="fas fa-snowflake"></i> Air Conditioner</h2>
+                                        <label class="toggle-switch">
+                                            <input type="checkbox" id="acSwitch">
+                                            <span class="slider"></span>
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <div class="col l-4">
+                                    <div class="card control-card">
+                                        <h2><i class="fas fa-fan"></i> Fan</h2>
+                                        <label class="toggle-switch">
+                                            <input type="checkbox" id="fanSwitch">
+                                            <span class="slider"></span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Right Column - Clock and Temperature -->
+                        <div class="col l-3">
+                            <!-- Clock -->
+                            <div class="card info-card">
+                                <div id="time"></div>
+                            </div>
+
+                            <!-- Temperature Gauge -->
+                            <div class="card sensor-card">
+                                <h2 style="text-align: center;">Thermostat</h2>
+                                <div class="temperature-container">
+                                    <div class="temperature-circle" id="temperatureCircle">
+                                        <h3>Temperature</h3>
+                                        <div class="temp-value" id="nhietdo">--</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Device Status -->
+                            <div class="card info-card">
+                                <h2><i class="fas fa-info-circle"></i> System Info</h2>
+                                <p style="font-size: 1rem;">Devices Online: <span id="deviceCount">3</span></p>
+                                <p style="font-size: 1rem;">Last Update: <span id="lastUpdate">--:--</span></p>
+                                <p style="font-size: 1rem;">Status: <span id="systemStatus">Active</span></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase Modular SDK Scripts -->
+    <script type="module" src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js"></script>
+    <script type="module" src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js"></script>
+    <script type="module" src="https://www.gstatic.com/firebasejs/9.23.0/firebase-analytics.js"></script>
+    <script type="module" src="script.js"></script>
+</body>
+</html>
