@@ -20,3 +20,8 @@ rad.json
 *.flf
 #Test results file
 TestResults.xml
+# Ignore credentials file
+credentials.h
+
+# Ignore other common files
+*.env
