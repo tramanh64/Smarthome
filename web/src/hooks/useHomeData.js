@@ -41,4 +41,7 @@ export function useHomeData() {
   }, []); // Mảng phụ thuộc rỗng, chỉ chạy 1 lần
 
   return { home, loading };
+}export async function updateHomeData(newData) {
+  const homeRef = doc(db, "homes", HOME_ID);
+  await setDoc(homeRef, { ...newData, last_updated: serverTimestamp() }, { merge: true });
 }

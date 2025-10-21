@@ -1,20 +1,59 @@
 // src/components/Dashboard/SensorCard.jsx
+import { Card, CardContent, Typography, Box } from "@mui/material";
 
 export default function SensorCard({ title, children }) {
   return (
-    <div
-      style={{
-        border: "1px solid #e5e7eb",
-        borderRadius: 12,
-        padding: 14,
-        background: "#fff",
-        boxShadow: "0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1)",
+    <Card
+      variant="outlined"
+      sx={{
+        width: 200,
+        height: 160,
+        display: "flex",
+        flexDirection: "column",
+        borderRadius: 2,
+        boxShadow: '0 2px 4px rgba(0,0,0,0.05)',
+        transition: 'transform 0.2s, box-shadow 0.2s',
+        '&:hover': {
+          transform: 'translateY(-2px)',
+          boxShadow: '0 4px 8px rgba(0,0,0,0.1)',
+        },
       }}
     >
-      <div style={{ fontSize: 12, fontWeight: 700, color: "#6b7280", marginBottom: 8 }}>
-        {title}
-      </div>
-      <div style={{ fontSize: 18, fontWeight: 600 }}>{children}</div>
-    </div>
+      <CardContent sx={{ 
+        p: 3,
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        height: '100%',
+        gap: 2
+      }}>
+        <Typography 
+          sx={{ 
+            fontSize: 14, 
+            color: "text.secondary",
+            fontWeight: 500,
+            whiteSpace: 'nowrap'
+          }}
+        >
+          {title}
+        </Typography>
+        <Typography 
+          variant="h4" 
+          component="div" 
+          sx={{ 
+            fontWeight: "bold",
+            color: 'primary.main',
+            whiteSpace: 'nowrap',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            width: '100%',
+            textAlign: 'center'
+          }}
+        >
+          {children}
+        </Typography>
+      </CardContent>
+    </Card>
   );
 }

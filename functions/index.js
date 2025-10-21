@@ -13,7 +13,7 @@ exports.logSensorHistory = functions.firestore
 
       const currentSensors = afterData.sensors;
       if (!currentSensors) {
-        console.log("Không có dữ liệu sensors, bỏ qua.");
+        console.log("No sensor data found, skipping history log.");
         return null;
       }
 
@@ -30,7 +30,7 @@ exports.logSensorHistory = functions.firestore
         const lastLogTimestamp = lastLogQuery.docs[0].data().timestamp.toDate();
         const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
         if (lastLogTimestamp > fiveMinutesAgo) {
-          console.log("Chưa đủ 5 phút từ lần log trước → bỏ qua.");
+          console.log("Last log was less than 5 minutes ago, skipping.");
           return null;
         }
       }
@@ -44,10 +44,10 @@ exports.logSensorHistory = functions.firestore
 
       try {
         await historyRef.add(historyEntry);
-        console.log(`Đã ghi lịch sử cho nhà ${homeId}:`, historyEntry);
+        console.log(`History logged for home ${homeId}:`, historyEntry);
         return {status: "success"};
       } catch (error) {
-        console.error("Lỗi khi ghi lịch sử:", error);
+        console.error("Error logging history:", error);
         return {status: "error"};
       }
     });

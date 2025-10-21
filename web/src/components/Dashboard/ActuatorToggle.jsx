@@ -1,38 +1,149 @@
 // src/components/Dashboard/ActuatorToggle.jsx
+import { Card, CardContent, Typography, Switch, FormControlLabel, Button, Box } from "@mui/material";
 
-export default function ActuatorToggle({ title, on, onChange, labels = { on: "On", off: "Off" } }) {
+export default function ActuatorToggle({
+  title,
+  on,
+  onChange,
+  labels = { on: "On", off: "Off" },
+  disabled = false,
+}) {
   return (
-    <div
-      style={{
-        border: "1px solid #e5e7eb",
-        borderRadius: 12,
-        padding: 14,
-        background: "#fff",
-        boxShadow: "0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1)",
+    <Card
+      elevation={0}
+      sx={{
+        width: 220,
+        height: 180,
+        display: "flex",
+        flexDirection: "column",
+        borderRadius: 3,
+        border: '1px solid',
+        borderColor: 'divider',
+        bgcolor: 'background.paper',
+        transition: 'all 0.3s ease',
+        '&:hover': {
+          transform: 'translateY(-4px)',
+          boxShadow: '0 8px 24px rgba(0,0,0,0.12)',
+          borderColor: on ? 'primary.main' : 'divider',
+        },
       }}
     >
-      <div style={{ fontSize: 12, fontWeight: 700, color: "#6b7280", marginBottom: 8 }}>
-        {title}
-      </div>
-      <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-        <button
-          onClick={() => onChange(!on)}
-          style={{
-            padding: "8px 14px",
-            borderRadius: 8,
-            border: "1px solid #d1d5db",
-            background: on ? "#10b981" : "#f3f4f6",
-            color: on ? "#fff" : "#111827",
-            cursor: "pointer",
-            fontWeight: 600,
+      <CardContent 
+        sx={{ 
+          height: '100%',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          p: 3
+        }}
+      >
+        <Typography
+          sx={{ 
+            fontSize: '0.95rem',
+            color: "text.secondary",
+            fontWeight: 500,
+            whiteSpace: 'nowrap',
+            textTransform: 'uppercase',
+            letterSpacing: '0.5px'
           }}
         >
-          {on ? labels.on : labels.off}
-        </button>
-        <span style={{ color: "#6b7280", fontSize: 13 }}>
-          State: <b>{on ? "ON" : "OFF"}</b>
-        </span>
-      </div>
-    </div>
+          {title}
+        </Typography>
+        
+        {title.includes("Door") ? (
+          <Button
+            variant={on ? "outlined" : "contained"}
+            onClick={() => onChange(!on)}
+            disabled={disabled}
+            sx={{ 
+              minWidth: 120,
+              height: 48,
+              borderRadius: 3,
+              textTransform: 'none',
+              fontSize: '1rem',
+              fontWeight: 600,
+              '&.Mui-disabled': {
+                bgcolor: 'action.disabledBackground',
+                color: 'text.disabled'
+              }
+            }}
+          >
+            {title.includes("Locked") ? "Unlock" : "Lock"}
+          </Button>
+        ) : (
+          <Box sx={{ 
+            display: 'flex', 
+            flexDirection: 'column', 
+            alignItems: 'center', 
+            gap: 2,
+            flex: 1,
+            justifyContent: 'center'
+          }}>
+            <Switch
+              checked={on}
+              onChange={(e) => onChange(e.target.checked)}
+              disabled={disabled}
+              sx={{
+                width: 62,
+                height: 34,
+                padding: 0,
+                '& .MuiSwitch-switchBase': {
+                  padding: 0,
+                  margin: '2px',
+                  transitionDuration: '300ms',
+                  '&.Mui-checked': {
+                    transform: 'translateX(28px)',
+                    color: '#fff',
+                    '& + .MuiSwitch-track': {
+                      backgroundColor: 'primary.main',
+                      opacity: 1,
+                      border: 0,
+                    },
+                    '&.Mui-disabled + .MuiSwitch-track': {
+                      opacity: 0.5,
+                    },
+                  },
+                  '&.Mui-focusVisible .MuiSwitch-thumb': {
+                    color: '#33cf4d',
+                    border: '6px solid #fff',
+                  },
+                  '&.Mui-disabled .MuiSwitch-thumb': {
+                    color: '#f5f5f5',
+                  },
+                  '&.Mui-disabled + .MuiSwitch-track': {
+                    opacity: 0.3,
+                  },
+                },
+                '& .MuiSwitch-thumb': {
+                  boxSizing: 'border-box',
+                  width: 30,
+                  height: 30,
+                  boxShadow: '0 2px 4px 0 rgb(0 35 11 / 20%)',
+                },
+                '& .MuiSwitch-track': {
+                  borderRadius: 34 / 2,
+                  backgroundColor: '#E9E9EA',
+                  opacity: 1,
+                  transition: 'background-color 500ms',
+                },
+              }}
+            />
+            <Typography 
+              sx={{ 
+                fontSize: '1rem',
+                fontWeight: 600,
+                color: on ? 'primary.main' : 'text.secondary',
+                transition: 'color 300ms',
+                textTransform: 'uppercase',
+                letterSpacing: '0.05em'
+              }}
+            >
+              {on ? labels.on : labels.off}
+            </Typography>
+          </Box>
+        )}
+      </CardContent>
+    </Card>
   );
 }
